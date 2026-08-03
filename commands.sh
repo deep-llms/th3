@@ -1,2 +1,5 @@
-#2 +a -f-/opt/dlami/nvme/sparse_emb_outputs/logs/experiments.log,/opt/dlami/nvme/sparse_emb_outputs/logs/baseline.log
-#pull-logs
+#1
+#clean-baseline
+rm -rf /opt/dlami/nvme/sparse_emb_outputs/baseline
+rm -rf /opt/dlami/nvme/sparse_emb_outputs/logs
+echo "Cleaned baseline output and logs"
