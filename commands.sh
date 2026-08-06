@@ -31,5 +31,6 @@ python eval/eval_parallel.py \
         /opt/dlami/nvme/sparse_emb_outputs/baseline/checkpoint-9000 \
         /opt/dlami/nvme/sparse_emb_outputs/baseline/checkpoint-10000 \
     --eval-dir /opt/dlami/nvme/sparse_emb_data/Qwen_Qwen3-0.6B/eval \
+    --tokenizer-name Qwen/Qwen3-0.6B \
     --bf16 \
     --num-gpus 8
