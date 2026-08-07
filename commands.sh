@@ -1,2 +1,2 @@
-#2 +500
-#pull-latest-log
+#2 +a -f-/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-1000/eval_ppl.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-2000/eval_ppl.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-3000/eval_ppl.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-4000/eval_ppl.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-5000/eval_ppl.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-6000/eval_ppl.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-7000/eval_ppl.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-8000/eval_ppl.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-9000/eval_ppl.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-10000/eval_ppl.json
+#pull-ant-ours-ppl
