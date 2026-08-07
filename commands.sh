@@ -1,18 +1,18 @@
-#1
-#probe-fixed-eval-one-ckpt
-eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
-sleep 3
-conda activate eval
-sleep 3
+#1 +120+a
+#grep-loaded-line-and-probe-result
+echo '=== A. grep OLD eval.log files for "Loaded compositional model" (expect count 0 in every file) ==='
+for f in /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-*/eval.log /opt/dlami/nvme/sparse_emb_outputs/baseline/checkpoint-*/eval.log; do
+    echo "$f: $(grep -c 'Loaded compositional model' "$f")"
+done
 
-ls /opt/dlami/nvme/sparse_emb_outputs/ant_ours/train_config.json
-ls /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-10000/train_config.json
-ls /opt/dlami/nvme/sparse_emb_outputs/baseline/train_config.json
+echo '=== B. probe result: fresh eval_ppl.json written by FIXED eval ==='
+cat /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-10000/eval_ppl.json
 
-CUDA_VISIBLE_DEVICES=0 python eval/eval_checkpoint.py \
-    --checkpoint /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-10000 \
-    --eval-dir /opt/dlami/nvme/sparse_emb_data/Qwen_Qwen3-0.6B/eval \
-    --tokenizer-name Qwen/Qwen3-0.6B \
-    --bf16 \
-    --ppl-only \
-    --langs en
+echo ''
+echo '=== C. probe run log: loading lines ==='
+PLOG=$(ls -t $HOME/deep-llms_th3/_run_log_/*probe-fixed-eval-one-ckpt* 2>/dev/null | head -1)
+if [ -z "$PLOG" ]; then
+    PLOG=$(find "$HOME" -maxdepth 4 -name "*probe-fixed-eval-one-ckpt*" 2>/dev/null | head -1)
+fi
+echo "probe log: $PLOG"
+grep -E "train_config|Loaded compositional|inferred|No such file|ppl=|loss=" "$PLOG" | head -20
