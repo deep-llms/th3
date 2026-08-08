@@ -1,39 +1,25 @@
-#1 +120+a
-#th3-clean-prep-retry
-echo '=== 1. kill any training (safety) ==='
-for i in 1 2 3; do
-    echo "attempt $i"
-    pkill -f run_experiments.py 2>/dev/null
-    pkill -f train_original_ant.py 2>/dev/null
-    pkill -f train_compositional.py 2>/dev/null
-    pkill -f "accelerate launch" 2>/dev/null
-    sleep 5
-done
+#1
+#th3-train-ant-ours
+eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
+sleep 3
+conda activate sparse_emb
+sleep 3
 
-echo '=== 2. state before cleanup ==='
-ls -la /opt/dlami/nvme/sparse_emb_outputs/
-
-echo '=== 3. delete old run output folders on th3 (baseline KEPT) ==='
-if [ ! -d /opt/dlami/nvme/sparse_emb_outputs/baseline ]; then echo "ERROR: baseline dir missing"; exit 1; fi
-rm -rf /opt/dlami/nvme/sparse_emb_outputs/ant_ours
-rm -rf /opt/dlami/nvme/sparse_emb_outputs/ant_ours_old16x
-rm -rf /opt/dlami/nvme/sparse_emb_outputs/smoke_ant
-rm -rf /opt/dlami/nvme/sparse_emb_outputs/logs
-
-echo '=== 4. remove all caches (again, harmless) ==='
-rm -rf ~/.cache/huggingface/datasets
-find /opt/dlami/nvme/sparse_emb_data -name "cache-*" -delete 2>/dev/null
-find /opt/dlami/nvme/sparse_emb_data -name "tmp*" -delete 2>/dev/null
-echo "caches removed"
-
-echo '=== 5. GPUs empty? ==='
 nvidia-smi
+sleep 3
 
-echo '=== 6. accelerate config ==='
+# Verify CUDA
+python -c "import torch; assert torch.cuda.is_available(), 'CUDA FAILED'; print(f'CUDA OK: {torch.cuda.device_count()} GPUs')"
+sleep 5
+
+# Verify output dir not exist (fresh start); baseline must be untouched
+if [ -d /opt/dlami/nvme/sparse_emb_outputs/ant_ours ]; then echo "ERROR: ant_ours dir already exists"; exit 1; fi
+if [ ! -d /opt/dlami/nvme/sparse_emb_outputs/baseline ]; then echo "ERROR: baseline dir missing"; exit 1; fi
+
+# Config
 mkdir -p ~/.cache/huggingface/accelerate
 cp resources/accelerate_config.yaml ~/.cache/huggingface/accelerate/default_config.yaml
-echo "config copied"
 
-echo '=== 7. final state (expect ONLY baseline) ==='
-ls -la /opt/dlami/nvme/sparse_emb_outputs/
-echo "TH3 PREP DONE"
+# Train ant_ours (entmax). Full-data schedule (~34.5k steps), stopped manually at 10k.
+export WANDB_MODE=offline
+python run_experiments.py --experiments 1 --stop-at-step 10000 --log-dir /opt/dlami/nvme/sparse_emb_outputs/logs
