@@ -1,15 +1,26 @@
-#1 +120+a
-#th3-check-progress-2
-echo '=== outputs ==='
-ls -la /opt/dlami/nvme/sparse_emb_outputs/ /opt/dlami/nvme/sparse_emb_outputs/logs/
-echo '=== experiments.log ==='
-cat /opt/dlami/nvme/sparse_emb_outputs/logs/experiments.log
-echo '=== latest loss lines ==='
-for f in /opt/dlami/nvme/sparse_emb_outputs/logs/*.log; do
-    echo "--- $f ---"
-    grep -o "{'loss'[^}]*}" "$f" | tail -3
-done
-echo '=== last checkpoint ==='
-ls -d /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-* 2>/dev/null | sort -V | tail -3
-echo '=== gpu ==='
-nvidia-smi | head -12
+#1
+#th3-eval-round2
+eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
+sleep 3
+conda activate eval
+sleep 3
+
+nvidia-smi
+sleep 3
+
+python eval/eval_parallel.py \
+    --checkpoints \
+        /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-1000 \
+        /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-2000 \
+        /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-3000 \
+        /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-4000 \
+        /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-5000 \
+        /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-6000 \
+        /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-7000 \
+        /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-8000 \
+        /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-9000 \
+        /opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-10000 \
+    --eval-dir /opt/dlami/nvme/sparse_emb_data/Qwen_Qwen3-0.6B/eval \
+    --tokenizer-name Qwen/Qwen3-0.6B \
+    --bf16 \
+    --num-gpus 8
