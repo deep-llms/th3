@@ -1,2 +1,12 @@
-#2 +a -f-/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-1000/eval_benchmarks.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-2000/eval_benchmarks.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-3000/eval_benchmarks.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-4000/eval_benchmarks.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-5000/eval_benchmarks.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-6000/eval_benchmarks.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-7000/eval_benchmarks.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-8000/eval_benchmarks.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-9000/eval_benchmarks.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-10000/eval_benchmarks.json
-#th3-pull-bench-r2
+#1 +120+a
+#th3-baseline-results-dump
+for i in 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000; do
+  for kind in eval_ppl eval_benchmarks; do
+    f=/opt/dlami/nvme/sparse_emb_outputs/baseline/checkpoint-$i/$kind.json
+    echo "===JSON baseline $i $kind==="
+    cat "$f" 2>/dev/null || echo MISSING
+    echo
+  done
+done
+echo '=== md5s for integrity ==='
+md5sum /opt/dlami/nvme/sparse_emb_outputs/baseline/checkpoint-*/eval_*.json
