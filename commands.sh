@@ -1,2 +1,13 @@
-#2 +a -f-/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-10000/eval_ppl_bytoken.npz,/opt/dlami/nvme/sparse_emb_outputs/baseline/checkpoint-10000/eval_ppl_bytoken.npz,/opt/dlami/nvme/sparse_emb_outputs/token_freq.npz,/opt/dlami/nvme/sparse_emb_outputs/token_freq_meta.json,/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-10000/eval_ppl_bytoken_summary.json,/opt/dlami/nvme/sparse_emb_outputs/baseline/checkpoint-10000/eval_ppl_bytoken_summary.json
-#th3-pull-bytoken-npz
+#1 +120+a
+#th3-run-dummy
+eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
+sleep 3
+conda activate sparse_emb
+sleep 3
+
+pkill -f dummy.py
+sleep 10
+
+nvidia-smi | head -12
+
+python dummy.py
