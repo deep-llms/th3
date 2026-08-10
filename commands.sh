@@ -1,12 +1,35 @@
-#1 +120+a
-#th3-baseline-results-dump
-for i in 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000; do
-  for kind in eval_ppl eval_benchmarks; do
-    f=/opt/dlami/nvme/sparse_emb_outputs/baseline/checkpoint-$i/$kind.json
-    echo "===JSON baseline $i $kind==="
-    cat "$f" 2>/dev/null || echo MISSING
-    echo
-  done
-done
-echo '=== md5s for integrity ==='
-md5sum /opt/dlami/nvme/sparse_emb_outputs/baseline/checkpoint-*/eval_*.json
+#1
+#th3-ppl-bytoken-and-freq
+eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
+sleep 3
+conda activate eval
+sleep 3
+
+nvidia-smi | head -12
+
+O=/opt/dlami/nvme/sparse_emb_outputs
+CUDA_VISIBLE_DEVICES=0 python eval/ppl_bytoken.py \
+    --checkpoint $O/ant_ours/checkpoint-10000 \
+    --eval-dir /opt/dlami/nvme/sparse_emb_data/Qwen_Qwen3-0.6B/eval \
+    --tokenizer-name Qwen/Qwen3-0.6B --bf16 \
+    > $O/ant_ours/checkpoint-10000/ppl_bytoken.log 2>&1 &
+CUDA_VISIBLE_DEVICES=1 python eval/ppl_bytoken.py \
+    --checkpoint $O/baseline/checkpoint-10000 \
+    --eval-dir /opt/dlami/nvme/sparse_emb_data/Qwen_Qwen3-0.6B/eval \
+    --tokenizer-name Qwen/Qwen3-0.6B --bf16 \
+    > $O/baseline/checkpoint-10000/ppl_bytoken.log 2>&1 &
+python scripts/count_token_freq.py \
+    --data-dir /opt/dlami/nvme/sparse_emb_data/Qwen_Qwen3-0.6B/train \
+    --tokenizer-name Qwen/Qwen3-0.6B \
+    --sample-every 10 --num-workers 64 \
+    --output $O/token_freq.npz \
+    > $O/token_freq.log 2>&1 &
+wait
+
+echo '=== ant_ours summary ==='
+cat $O/ant_ours/checkpoint-10000/eval_ppl_bytoken_summary.json
+echo '=== baseline summary ==='
+cat $O/baseline/checkpoint-10000/eval_ppl_bytoken_summary.json
+echo '=== freq log tail ==='
+tail -8 $O/token_freq.log
+echo TH3 BYTOKEN DONE
