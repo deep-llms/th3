@@ -1,5 +1,4 @@
 #1 +120+a
-#th3-gpu-check
-nvidia-smi
-pgrep -af "python|accelerate|train" | head -5 || echo "no processes"
-ls -la /opt/dlami/nvme/sparse_emb_outputs/ | head -15
+#th3-gpu-verify
+nvidia-smi | grep -E "MiB /|No running"
+echo TH3 VERIFIED
