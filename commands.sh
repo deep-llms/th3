@@ -1,10 +1,18 @@
 #1 +120+a
-#th3-progress-2
+#th3-find-crash
+echo '=== all run logs from Aug 13 ==='
+ls -la _run_log_/_run-2026-08-13* 2>/dev/null || echo "none"
+echo '=== any residual_ant run log? ==='
+ls -la _run_log_/*residual* 2>/dev/null || echo "none"
+echo '=== last 3 run logs content (tail 50 each) ==='
+for f in $(ls -t _run_log_/*.log 2>/dev/null | head -3); do
+    echo "--- $f ---"
+    tail -50 "$f"
+done
+echo '=== dmesg GPU errors? ==='
+dmesg | grep -iE "gpu|nccl|xid|error|oom|killed" | tail -10 || echo "none"
+echo '=== residual_ant dir ==='
+ls -la /opt/dlami/nvme/sparse_emb_outputs/residual_ant/ 2>/dev/null || echo "NOT EXIST"
 echo '=== experiments.log ==='
-cat /opt/dlami/nvme/sparse_emb_outputs/logs/experiments.log 2>/dev/null
-echo '=== last loss lines ==='
-grep -o "{'loss'[^}]*}" /opt/dlami/nvme/sparse_emb_outputs/logs/residual_ant.log 2>/dev/null | tail -3
-echo '=== gpu ==='
-nvidia-smi | grep -E "MiB /" | head -4
-echo '=== latest checkpoint ==='
-ls -d /opt/dlami/nvme/sparse_emb_outputs/residual_ant/checkpoint-* 2>/dev/null | sort -V | tail -3
+cat /opt/dlami/nvme/sparse_emb_outputs/logs/experiments.log 2>/dev/null || echo "empty"
+echo TH3 CRASH CHECK DONE
