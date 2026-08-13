@@ -1,15 +1,17 @@
-#1 +120+a
-#th3-verify-clean
-echo '=== GPUs ==='
-nvidia-smi | grep -E "MiB /|No running"
-echo '=== processes ==='
-pgrep -af "python|accelerate|train" | grep -v pgrep | grep -v networkd | grep -v unattended | head -5 || echo "no processes"
-echo '=== residual_ant dir ==='
-ls -d /opt/dlami/nvme/sparse_emb_outputs/residual_ant 2>/dev/null && echo "EXISTS" || echo "NOT EXIST"
-echo '=== lowrank dir ==='
-ls -d /opt/dlami/nvme/sparse_emb_outputs/lowrank 2>/dev/null && echo "EXISTS" || echo "NOT EXIST"
-echo '=== HF cache ==='
-du -sh ~/.cache/huggingface/datasets 2>/dev/null || echo "NO CACHE"
-echo '=== data cache count ==='
-find /opt/dlami/nvme/sparse_emb_data -name "cache-*" 2>/dev/null | wc -l
-echo TH3 VERIFY DONE
+#1
+#th3-train-residual-ant-retry
+eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
+sleep 3
+conda activate sparse_emb
+sleep 3
+
+nvidia-smi | head -12
+python -c "import torch; assert torch.cuda.is_available(); print(f'CUDA OK: {torch.cuda.device_count()} GPUs')"
+
+if [ -d /opt/dlami/nvme/sparse_emb_outputs/residual_ant ]; then echo "ERROR: residual_ant dir already exists"; exit 1; fi
+
+mkdir -p ~/.cache/huggingface/accelerate
+cp resources/accelerate_config.yaml ~/.cache/huggingface/accelerate/default_config.yaml
+
+export WANDB_MODE=offline
+python run_experiments.py --experiments 5 --stop-at-step 10000 --log-dir /opt/dlami/nvme/sparse_emb_outputs/logs
