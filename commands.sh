@@ -1,24 +1,18 @@
 #1 +120+a
-#th3-cuda-verify-fresh
-echo '=== fabric manager status ==='
+#th3-final-verify
+echo '=== FM status ==='
 sudo systemctl status nvidia-fabricmanager 2>&1 | head -5
-echo '=== fresh CUDA test (sparse_emb) ==='
+echo '=== GPU ==='
+nvidia-smi | grep -E "MiB /|No running"
+echo '=== CUDA sparse_emb ==='
 eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
 conda activate sparse_emb
-python -c "
-import torch
-print('cuda available:', torch.cuda.is_available())
-print('device count:', torch.cuda.device_count())
-print('device 0:', torch.cuda.get_device_name(0))
-x = torch.randn(100, 100, device='cuda')
-print('matmul ok:', (x @ x).shape)
-"
-echo '=== fresh CUDA test (eval) ==='
+python -c "import torch; print('cuda:', torch.cuda.is_available(), 'gpus:', torch.cuda.device_count()); x=torch.randn(100,100,device='cuda'); print('ok')"
+echo '=== CUDA eval ==='
 conda activate eval
-python -c "
-import torch
-print('cuda available:', torch.cuda.is_available())
-x = torch.randn(100, 100, device='cuda')
-print('matmul ok:', (x @ x).shape)
-"
-echo TH3 CUDA VERIFY
+python -c "import torch; print('cuda:', torch.cuda.is_available()); x=torch.randn(100,100,device='cuda'); print('ok')"
+echo '=== outputs ==='
+ls -d /opt/dlami/nvme/sparse_emb_outputs/*/
+echo '=== residual_ant latest ckpt ==='
+ls -d /opt/dlami/nvme/sparse_emb_outputs/residual_ant/checkpoint-* 2>/dev/null | sort -V | tail -3
+echo TH3 FINAL OK
