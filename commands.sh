@@ -1,21 +1,12 @@
-#1
-#th3-resume-residual-ant-clean
-eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
-sleep 3
-conda activate sparse_emb
-sleep 3
-
-# Clean stale logs from the CUDA-crashed resume attempt
-rm -f /opt/dlami/nvme/sparse_emb_outputs/logs/experiments.log
-echo "cleaned stale experiments.log"
-
-nvidia-smi | head -12
-python -c "import torch; assert torch.cuda.is_available(); print(f'CUDA OK: {torch.cuda.device_count()} GPUs')"
-
-if [ ! -d /opt/dlami/nvme/sparse_emb_outputs/residual_ant ]; then echo "ERROR: residual_ant dir missing"; exit 1; fi
-
-mkdir -p ~/.cache/huggingface/accelerate
-cp resources/accelerate_config.yaml ~/.cache/huggingface/accelerate/default_config.yaml
-
-export WANDB_MODE=offline
-python run_experiments.py --experiments 5 --stop-at-step 10000 --log-dir /opt/dlami/nvme/sparse_emb_outputs/logs
+#1 +120+a
+#th3-running-ok
+echo '=== gpu ==='
+nvidia-smi | grep -E "MiB /" | head -4
+echo '=== training process ==='
+pgrep -af "run_experiments\|train_compositional\|accelerate" | grep -v pgrep | head -3 || echo "no training processes"
+echo '=== experiments.log ==='
+cat /opt/dlami/nvme/sparse_emb_outputs/logs/experiments.log 2>/dev/null || echo "empty"
+echo '=== latest loss ==='
+grep -o "{'loss'[^}]*}" /opt/dlami/nvme/sparse_emb_outputs/logs/residual_ant.log 2>/dev/null | tail -2
+echo '=== latest checkpoint ==='
+ls -d /opt/dlami/nvme/sparse_emb_outputs/residual_ant/checkpoint-* 2>/dev/null | sort -V | tail -3
