@@ -1,25 +1,13 @@
 #1 +120+a
-#th3-check-new-machine
-echo '=== OS ==='
-cat /etc/os-release | head -5
-uname -a
-echo '=== hostname ==='
-hostname
-echo '=== GPUs ==='
-nvidia-smi | head -20
-echo '=== disk ==='
-df -h | grep -E "nvme|opt|home|Filesystem"
-echo '=== conda ==='
-which conda 2>/dev/null || echo "no conda"
-ls $HOME/miniconda3/envs/ 2>/dev/null || echo "no miniconda3"
-echo '=== project dir ==='
-ls -la /opt/dlami/nvme/ 2>/dev/null || echo "no /opt/dlami/nvme"
-ls -la $HOME/ | head -15
-echo '=== data ==='
-ls -la /opt/dlami/nvme/sparse_emb_data/ 2>/dev/null || echo "no data dir"
-echo '=== outputs ==='
-ls -la /opt/dlami/nvme/sparse_emb_outputs/ 2>/dev/null || echo "no outputs dir"
-echo '=== python ==='
-python3 --version 2>/dev/null
-pip3 list 2>/dev/null | grep -E "torch|transformers|accelerate|datasets" | head -5
-echo TH3 MACHINE CHECK DONE
+#th3-check-running
+echo '=== GPU processes ==='
+nvidia-smi | grep -E "MiB /|No running|python" | head -12
+echo '=== training/eval processes ==='
+pgrep -af "python|accelerate|run_experiments|train" | grep -v pgrep | grep -v networkd | grep -v unattended | head -10 || echo "no processes"
+echo '=== residual_ant training status ==='
+cat /opt/dlami/nvme/sparse_emb_outputs/logs/experiments.log 2>/dev/null
+echo '=== residual_ant latest checkpoints ==='
+ls -d /opt/dlami/nvme/sparse_emb_outputs/residual_ant/checkpoint-* 2>/dev/null | sort -V | tail -3
+echo '=== residual_ant last loss ==='
+grep -o "{'loss'[^}]*}" /opt/dlami/nvme/sparse_emb_outputs/logs/residual_ant.log 2>/dev/null | tail -3
+echo TH3 CHECK DONE
