@@ -1,17 +1,14 @@
-#1
-#th3-train-residual-ant-fix
-eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
-sleep 3
-conda activate sparse_emb
-sleep 3
-
-nvidia-smi | head -12
-python -c "import torch; assert torch.cuda.is_available(); print(f'CUDA OK: {torch.cuda.device_count()} GPUs')"
-
-if [ -d /opt/dlami/nvme/sparse_emb_outputs/residual_ant ]; then echo "ERROR: residual_ant dir already exists"; exit 1; fi
-
-mkdir -p ~/.cache/huggingface/accelerate
-cp resources/accelerate_config.yaml ~/.cache/huggingface/accelerate/default_config.yaml
-
-export WANDB_MODE=offline
-python run_experiments.py --experiments 5 --stop-at-step 10000 --log-dir /opt/dlami/nvme/sparse_emb_outputs/logs
+#1 +120+a
+#th3-confirm-training
+echo '=== run status tail ==='
+tail -3 _RUN_STATUS_.log
+echo '=== experiments.log ==='
+cat /opt/dlami/nvme/sparse_emb_outputs/logs/experiments.log 2>/dev/null || echo "empty"
+echo '=== residual_ant dir ==='
+ls -la /opt/dlami/nvme/sparse_emb_outputs/residual_ant/ 2>/dev/null | head -10 || echo "NOT EXIST"
+echo '=== first loss lines ==='
+grep -o "{'loss'[^}]*}" /opt/dlami/nvme/sparse_emb_outputs/logs/residual_ant.log 2>/dev/null | head -5
+echo '=== last loss lines ==='
+grep -o "{'loss'[^}]*}" /opt/dlami/nvme/sparse_emb_outputs/logs/residual_ant.log 2>/dev/null | tail -3
+echo '=== gpu ==='
+nvidia-smi | grep -E "MiB /" | head -4
