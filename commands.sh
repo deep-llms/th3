@@ -1,18 +1,14 @@
 #1 +120+a
-#th3-final-verify
-echo '=== FM status ==='
-sudo systemctl status nvidia-fabricmanager 2>&1 | head -5
-echo '=== GPU ==='
-nvidia-smi | grep -E "MiB /|No running"
-echo '=== CUDA sparse_emb ==='
-eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
-conda activate sparse_emb
-python -c "import torch; print('cuda:', torch.cuda.is_available(), 'gpus:', torch.cuda.device_count()); x=torch.randn(100,100,device='cuda'); print('ok')"
-echo '=== CUDA eval ==='
-conda activate eval
-python -c "import torch; print('cuda:', torch.cuda.is_available()); x=torch.randn(100,100,device='cuda'); print('ok')"
-echo '=== outputs ==='
-ls -d /opt/dlami/nvme/sparse_emb_outputs/*/
-echo '=== residual_ant latest ckpt ==='
-ls -d /opt/dlami/nvme/sparse_emb_outputs/residual_ant/checkpoint-* 2>/dev/null | sort -V | tail -3
-echo TH3 FINAL OK
+#th3-check-stale
+echo '=== any checkpoint beyond 7000? ==='
+ls -d /opt/dlami/nvme/sparse_emb_outputs/residual_ant/checkpoint-* | sort -V | tail -5
+echo '=== incomplete checkpoints (no trainer_state)? ==='
+for d in /opt/dlami/nvme/sparse_emb_outputs/residual_ant/checkpoint-*/; do
+    [ ! -f "$d/trainer_state.json" ] && echo "INCOMPLETE: $(basename $d)"
+done
+echo "check done"
+echo '=== experiments.log ==='
+cat /opt/dlami/nvme/sparse_emb_outputs/logs/experiments.log 2>/dev/null
+echo '=== residual_ant.log last 5 lines ==='
+tail -5 /opt/dlami/nvme/sparse_emb_outputs/logs/residual_ant.log 2>/dev/null
+echo TH3 STALE CHECK DONE
