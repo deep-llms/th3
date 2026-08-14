@@ -1,20 +1,18 @@
-#1 +120+a
-#th3-cancel-clean-finetune
-echo '=== kill finetune ==='
-for i in 1 2 3; do
-    pkill -f "finetune/run_all.py" 2>/dev/null
-    pkill -f "finetune/train.py" 2>/dev/null
-    sleep 5
-done
-nvidia-smi --query-compute-apps=pid --format=csv,noheader | while read pid; do
-    [ -n "$pid" ] && kill -9 "$pid" 2>/dev/null && echo "killed $pid"
-done
-sleep 5
-echo '=== remove finetune outputs ==='
-rm -rf /opt/dlami/nvme/sparse_emb_outputs/finetune
-echo '=== remove caches ==='
-rm -rf ~/.cache/huggingface/datasets
-echo '=== verify ==='
-nvidia-smi | grep -E "MiB /|No running" | head -4
-ls /opt/dlami/nvme/sparse_emb_outputs/finetune 2>/dev/null || echo "finetune dir: gone"
-echo TH3 FINETUNE CLEANED
+#1
+#th3-finetune-parallel
+eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
+sleep 3
+conda activate sparse_emb
+sleep 3
+
+nvidia-smi | head -12
+
+python finetune/run_all.py \
+    --checkpoints \
+        residual_ant=/opt/dlami/nvme/sparse_emb_outputs/residual_ant/checkpoint-10000 \
+        ant_ours=/opt/dlami/nvme/sparse_emb_outputs/ant_ours/checkpoint-10000 \
+        baseline=/opt/dlami/nvme/sparse_emb_outputs/baseline/checkpoint-10000 \
+    --tasks ag_news sst2 xnli paws_x hellaswag \
+    --modes full probe \
+    --seeds 42 123 456 \
+    --output-dir /opt/dlami/nvme/sparse_emb_outputs/finetune
