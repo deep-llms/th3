@@ -1,5 +1,5 @@
-#1 +120+a
-#th3-rerun-shared-local-tied
+#2 +a
+#th3-rerun-shared-local-progress
 eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
 sleep 3
 conda activate sparse_emb
