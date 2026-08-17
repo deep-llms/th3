@@ -1,5 +1,5 @@
-#1 +60+a
-#th3-wait-verify-shared-local-tied-finetune-final-2
+#2 +a -f-/opt/dlami/nvme/sparse_emb_outputs/shared_local_tied/checkpoint-10000/eval_ppl.json,/opt/dlami/nvme/sparse_emb_outputs/shared_local_tied/checkpoint-10000/eval_benchmarks.json
+#th3-pull-shared-local-tied-eval-results
 set -euo pipefail
 echo '=== th3 wait for shared-local tied finetune ==='
 date -u
