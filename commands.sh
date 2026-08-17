@@ -1,5 +1,6 @@
 #1 +60+a
 #th3-wait-verify-shared-local-tied-finetune-final
+set -euo pipefail
 echo '=== th3 wait for shared-local tied finetune ==='
 date -u
 hostname
