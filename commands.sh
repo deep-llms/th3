@@ -1,5 +1,5 @@
-#2 +a
-#th3-pull-shared-local-tied-watcher-1
+#1 +60+a
+#th3-wait-verify-shared-local-tied-finetune-final-2
 set -euo pipefail
 echo '=== th3 wait for shared-local tied finetune ==='
 date -u
@@ -32,7 +32,7 @@ test "$TASK_JSON_COUNT" -eq 9
 test "$TASK_LOG_COUNT" -eq 9
 test -s "$TASK_OUTPUT_DIR/summary.md"
 
-python - "$TASK_OUTPUT_DIR" "$TASK_ARM" <<'PY'
+/home/ubuntu/miniconda3/envs/eval/bin/python - "$TASK_OUTPUT_DIR" "$TASK_ARM" <<'PY'
 import glob
 import json
 import math
