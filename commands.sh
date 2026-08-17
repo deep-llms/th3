@@ -1,5 +1,5 @@
-#1 +60+a
-#th3-wait-verify-shared-local-tied-finetune-final
+#2 +a
+#th3-pull-shared-local-tied-watcher-1
 set -euo pipefail
 echo '=== th3 wait for shared-local tied finetune ==='
 date -u
