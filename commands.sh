@@ -1,12 +1,12 @@
 #1 +60+a
-#th3-run-supervised-llm-pretrain-burn-20260822
+#th3-run-project-gpu-burn-20260822
 set -euo pipefail
 
-echo '=== th3 supervised GPU burn ==='
+echo '=== th3 project GPU burn ==='
 date -u
 hostname
 
-TASK_BURN_SCRIPT="/tmp/llm_pretrain_burn.py"
+TASK_BURN_SCRIPT="scripts/gpu_burn.py"
 test -s "$TASK_BURN_SCRIPT"
 
 TASK_GPU_COUNT="$(nvidia-smi --query-gpu=index --format=csv,noheader | wc -l)"
@@ -30,7 +30,7 @@ trap cleanup_burn_workers EXIT INT TERM
 
 echo '=== launch one supervised worker per GPU ==='
 for TASK_GPU in 0 1 2 3 4 5 6 7; do
-    TASK_LOG="/tmp/llm_pretrain_burn_gpu${TASK_GPU}.log"
+    TASK_LOG="/tmp/project_gpu_burn_gpu${TASK_GPU}.log"
     env CUDA_VISIBLE_DEVICES="$TASK_GPU" /usr/bin/python3 -u "$TASK_BURN_SCRIPT" >"$TASK_LOG" 2>&1 &
     TASK_CHILD_PIDS+=("$!")
     echo "launched gpu=$TASK_GPU pid=$! log=$TASK_LOG"
